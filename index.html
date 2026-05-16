@@ -339,7 +339,7 @@ footer span { color: var(--magenta); }
 //  ⚠️  SUBSTITUA A URL ABAIXO PELA URL DO SEU WEB APP
 //     (gerada no Apps Script após o deploy)
 // ══════════════════════════════════════════════════════════
-var SHEET_URL = "https://script.google.com/macros/s/AKfycbyQDCwztDAQVzhWpmxc-t7T_pnp-1hN0amflAKUHgsq53duLr9KM2G_ptAKEmKc7CDn7g/exec";
+var SHEET_URL = "https://script.google.com/macros/s/AKfycbzPhUmlAy2tb8kBZz7Gm8baL-g0BotYGiIB_5Rf3rJCO82h47iY4FWpKPPDQ9fsap0aNg/exec";
 // ══════════════════════════════════════════════════════════
 
 function lvlLabel(v) {
@@ -440,29 +440,46 @@ function submitForm() {
   sending.style.display = 'block';
   errorEl.style.display = 'none';
 
-  fetch(SHEET_URL, {
-    method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  })
-  .then(function() {
-    // no-cors retorna opaque response; assumimos sucesso
-    document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('visible'); });
-    document.getElementById('success').style.display = 'block';
-    for(var i=1;i<=4;i++){
-      var tick = document.getElementById('t'+i);
-      if(tick) tick.classList.add('done');
+  // JSONP — funciona sem bloqueio de CORS
+  var callbackName = 'odp_cb_' + Date.now();
+  var script = document.createElement('script');
+
+  window[callbackName] = function(response) {
+    delete window[callbackName];
+    document.body.removeChild(script);
+    if (response && response.status === 'ok') {
+      document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('visible'); });
+      document.getElementById('success').style.display = 'block';
+      for(var i=1;i<=4;i++){
+        var tick = document.getElementById('t'+i);
+        if(tick) tick.classList.add('done');
+      }
+      document.getElementById('cur').textContent = '4';
+      window.scrollTo({top:0,behavior:'smooth'});
+    } else {
+      btn.disabled = false;
+      btn.textContent = 'Enviar formulário ✓';
+      sending.style.display = 'none';
+      errorEl.style.display = 'block';
     }
-    document.getElementById('cur').textContent = '4';
-    window.scrollTo({top:0,behavior:'smooth'});
-  })
-  .catch(function(err) {
+  };
+
+  script.onerror = function() {
+    delete window[callbackName];
+    document.body.removeChild(script);
     btn.disabled = false;
     btn.textContent = 'Enviar formulário ✓';
     sending.style.display = 'none';
     errorEl.style.display = 'block';
-  });
+  };
+
+  // Envia os dados como parâmetros GET + callback JSONP
+  var params = Object.keys(data).map(function(k){
+    return encodeURIComponent(k) + '=' + encodeURIComponent(data[k]);
+  }).join('&');
+
+  script.src = SHEET_URL + '?callback=' + callbackName + '&' + params;
+  document.body.appendChild(script);
 }
 </script>
 </body>
