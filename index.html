@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ODP — Formulário de Onboarding</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500&family=Space+Mono&display=swap" rel="stylesheet" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --magenta: #E8005A;
+  --magenta-dark: #c4004d;
+  --black: #0A0A0A;
+  --surface: #111111;
+  --surface2: #161616;
+  --border: #222222;
+  --border2: #2e2e2e;
+  --text: #f0f0f0;
+  --muted: #888888;
+  --dim: #555555;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--black); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 15px; line-height: 1.6; min-height: 100vh; }
+
+.hero { position: relative; background: var(--black); border-bottom: 1px solid var(--border); padding: 3.5rem 2.5rem 3rem; overflow: hidden; }
+.hero::before { content: ''; position: absolute; top: -60px; right: -60px; width: 300px; height: 300px; border-radius: 50%; border: 56px solid var(--magenta); opacity: 0.06; pointer-events: none; }
+.hero-tag { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--magenta); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 1rem; }
+.hero h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(52px, 8vw, 80px); letter-spacing: 3px; line-height: 0.95; color: #fff; margin-bottom: 0.1em; }
+.hero h1 span { color: var(--magenta); }
+.hero-desc { font-size: 14px; color: var(--muted); line-height: 1.7; max-width: 480px; margin-top: 1.25rem; }
+
+.progress-bar { background: var(--surface2); border-bottom: 1px solid var(--border); padding: 1rem 2.5rem; display: flex; align-items: center; gap: 14px; position: sticky; top: 0; z-index: 10; }
+.steps { display: flex; gap: 6px; flex: 1; }
+.step-tick { height: 3px; flex: 1; background: var(--border2); border-radius: 2px; transition: background 0.35s ease; }
+.step-tick.done { background: var(--magenta); }
+.prog-text { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--dim); white-space: nowrap; flex-shrink: 0; }
+.prog-text em { color: var(--magenta); font-style: normal; }
+
+.form-body { max-width: 680px; margin: 0 auto; padding: 2.5rem 2.5rem 4rem; }
+.section { display: none; animation: rise 0.3s ease both; }
+.section.visible { display: block; }
+@keyframes rise { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+.sec-header { margin-bottom: 2rem; }
+.sec-num { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--dim); letter-spacing: 2px; margin-bottom: 0.4rem; }
+.sec-title { font-family: 'Bebas Neue', sans-serif; font-size: 34px; letter-spacing: 1.5px; color: #fff; line-height: 1; }
+.sec-title span { color: var(--magenta); }
+.sec-sub { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--dim); margin-top: 0.4rem; }
+
+.field { margin-bottom: 1.75rem; }
+.field-label { display: block; font-size: 11px; font-weight: 500; color: #aaa; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 0.6rem; }
+
+input[type="text"], input[type="email"], textarea, select { width: 100%; background: var(--surface); border: 1px solid var(--border2); border-radius: 6px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 12px 14px; outline: none; transition: border-color 0.2s; appearance: none; }
+input[type="text"]:focus, input[type="email"]:focus, textarea:focus, select:focus { border-color: var(--magenta); }
+::placeholder { color: var(--dim); }
+textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+
+.radio-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.radio-card { border: 1px solid var(--border2); border-radius: 6px; padding: 12px 14px; cursor: pointer; transition: border-color 0.2s, background 0.2s; display: flex; align-items: flex-start; gap: 10px; user-select: none; }
+.radio-card:hover { border-color: #555; }
+.radio-card.selected { border-color: var(--magenta); background: rgba(232,0,90,0.07); }
+.r-dot { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid #444; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; transition: border-color 0.2s, background 0.2s; }
+.radio-card.selected .r-dot { border-color: var(--magenta); background: var(--magenta); }
+.r-dot::after { content: ''; width: 5px; height: 5px; border-radius: 50%; background: #fff; display: none; }
+.radio-card.selected .r-dot::after { display: block; }
+.r-label { font-size: 13px; color: #ccc; line-height: 1.4; }
+
+.check-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 8px; }
+.check-card { border: 1px solid var(--border2); border-radius: 6px; padding: 12px 14px; cursor: pointer; display: flex; align-items: flex-start; gap: 10px; transition: border-color 0.2s, background 0.2s; user-select: none; }
+.check-card:hover { border-color: #555; }
+.check-card.selected { border-color: var(--magenta); background: rgba(232,0,90,0.07); }
+.c-box { width: 14px; height: 14px; border-radius: 3px; border: 1.5px solid #444; flex-shrink: 0; margin-top: 2px; display: flex; align-items: center; justify-content: center; transition: border-color 0.2s, background 0.2s; font-size: 9px; color: #fff; font-weight: 700; }
+.check-card.selected .c-box { border-color: var(--magenta); background: var(--magenta); }
+.check-card.selected .c-box::after { content: '✓'; }
+
+.range-wrap { padding-bottom: 0.25rem; }
+.range-meta { display: flex; justify-content: space-between; font-family: 'Space Mono', monospace; font-size: 10px; color: var(--dim); margin-bottom: 0.5rem; }
+input[type="range"] { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; background: var(--border2); border-radius: 2px; outline: none; cursor: pointer; padding: 0; border: none; }
+input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: var(--magenta); cursor: pointer; border: 2px solid #fff; }
+input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border-radius: 50%; background: var(--magenta); cursor: pointer; border: 2px solid #fff; }
+.range-val { text-align: center; font-family: 'Space Mono', monospace; font-size: 12px; color: var(--magenta); margin-top: 8px; }
+
+.divider { height: 1px; background: var(--border); margin: 2rem 0; }
+
+.nav-row { display: flex; gap: 10px; margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--border); }
+.btn-back { background: transparent; border: 1px solid var(--border2); color: var(--dim); font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 13px 22px; border-radius: 6px; cursor: pointer; transition: border-color 0.2s, color 0.2s; }
+.btn-back:hover { border-color: #555; color: #aaa; }
+.btn-next { flex: 1; background: var(--magenta); border: none; color: #fff; font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 2px; padding: 13px 32px; border-radius: 6px; cursor: pointer; transition: background 0.2s, transform 0.1s; }
+.btn-next:hover { background: var(--magenta-dark); }
+.btn-next:active { transform: scale(0.98); }
+.btn-next:disabled { background: #333; color: #666; cursor: not-allowed; }
+
+.sending-msg { text-align: center; font-family: 'Space Mono', monospace; font-size: 12px; color: var(--dim); margin-top: 1rem; display: none; }
+
+.success-wrap { display: none; text-align: center; padding: 5rem 2.5rem; animation: rise 0.4s ease both; }
+.success-icon { width: 72px; height: 72px; border-radius: 50%; border: 2px solid var(--magenta); display: flex; align-items: center; justify-content: center; font-size: 32px; color: var(--magenta); margin: 0 auto 2rem; }
+.success-wrap h2 { font-family: 'Bebas Neue', sans-serif; font-size: 44px; letter-spacing: 2px; color: #fff; margin-bottom: 0.5rem; }
+.success-wrap p { font-size: 14px; color: var(--muted); line-height: 1.8; max-width: 360px; margin: 0 auto; }
+.success-wrap strong { color: var(--magenta); }
+
+.error-msg { background: rgba(232,0,90,0.1); border: 1px solid rgba(232,0,90,0.3); border-radius: 6px; padding: 12px 16px; font-size: 13px; color: #f0a0b8; margin-top: 1rem; display: none; font-family: 'Space Mono', monospace; }
+
+footer { text-align: center; padding: 2rem; border-top: 1px solid var(--border); font-family: 'Space Mono', monospace; font-size: 10px; color: var(--dim); letter-spacing: 1px; }
+footer span { color: var(--magenta); }
+
+@media (max-width: 600px) {
+  .hero { padding: 2.5rem 1.5rem 2rem; }
+  .form-body { padding: 2rem 1.5rem 4rem; }
+  .progress-bar { padding: 1rem 1.5rem; }
+  .radio-grid, .check-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-tag">Formulário de Onboarding · Turma 2025</div>
+  <h1>Bem-vindo ao<br><span>ODP</span></h1>
+  <p class="hero-desc">Antes de começarmos, queremos entender você — sua rotina, seus objetivos e o que espera da Odontologia Digital Sem Promessas.</p>
+</div>
+
+<div class="progress-bar">
+  <div class="steps">
+    <div class="step-tick done" id="t1"></div>
+    <div class="step-tick" id="t2"></div>
+    <div class="step-tick" id="t3"></div>
+    <div class="step-tick" id="t4"></div>
+  </div>
+  <div class="prog-text">Etapa <em id="cur">1</em> de 4</div>
+</div>
+
+<div class="form-body">
+
+  <!-- SEÇÃO 1 -->
+  <div class="section visible" id="sec1">
+    <div class="sec-header">
+      <div class="sec-num">// 01</div>
+      <div class="sec-title">Quem é <span>você?</span></div>
+      <div class="sec-sub">Identificação e perfil profissional</div>
+    </div>
+    <div class="field"><label class="field-label">Nome completo</label><input type="text" placeholder="Dr(a). ..." id="f-nome" /></div>
+    <div class="field"><label class="field-label">E-mail</label><input type="email" placeholder="seu@email.com" id="f-email" /></div>
+    <div class="field"><label class="field-label">WhatsApp</label><input type="text" placeholder="(00) 00000-0000" id="f-whats" /></div>
+    <div class="field"><label class="field-label">Cidade / Estado</label><input type="text" placeholder="Ex: Fortaleza – CE" id="f-cidade" /></div>
+    <div class="field"><label class="field-label">Ano de formação</label><input type="text" placeholder="Ex: 2018" id="f-ano" /></div>
+    <div class="field">
+      <label class="field-label">Área de atuação principal</label>
+      <div class="radio-grid">
+        <div class="radio-card" onclick="selectRadio(this,'area')"><div class="r-dot"></div><span class="r-label">Clínica Geral</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'area')"><div class="r-dot"></div><span class="r-label">Implantodontia</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'area')"><div class="r-dot"></div><span class="r-label">Prótese / Reabilitação</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'area')"><div class="r-dot"></div><span class="r-label">Ortodontia</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'area')"><div class="r-dot"></div><span class="r-label">Cirurgia Oral</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'area')"><div class="r-dot"></div><span class="r-label">Periodontia</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'area')"><div class="r-dot"></div><span class="r-label">Endodontia</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'area')"><div class="r-dot"></div><span class="r-label">Outra</span></div>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Tipo de atuação</label>
+      <div class="radio-grid">
+        <div class="radio-card" onclick="selectRadio(this,'tipo')"><div class="r-dot"></div><span class="r-label">Clínica própria</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'tipo')"><div class="r-dot"></div><span class="r-label">Associado / locatário</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'tipo')"><div class="r-dot"></div><span class="r-label">Planos de saúde</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'tipo')"><div class="r-dot"></div><span class="r-label">Particular</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'tipo')"><div class="r-dot"></div><span class="r-label">Misto</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'tipo')"><div class="r-dot"></div><span class="r-label">Pós-graduando / acadêmico</span></div>
+      </div>
+    </div>
+    <div class="nav-row"><button class="btn-next" onclick="goTo(2)">Próxima etapa →</button></div>
+  </div>
+
+  <!-- SEÇÃO 2 -->
+  <div class="section" id="sec2">
+    <div class="sec-header">
+      <div class="sec-num">// 02</div>
+      <div class="sec-title">Seu nível <span>digital</span></div>
+      <div class="sec-sub">Experiência e rotina tecnológica atual</div>
+    </div>
+    <div class="field">
+      <label class="field-label">Como você define seu nível de experiência com odontologia digital?</label>
+      <div class="range-wrap">
+        <div class="range-meta"><span>Nenhuma</span><span>Básico</span><span>Intermediário</span><span>Avançado</span><span>Expert</span></div>
+        <input type="range" min="1" max="5" value="2" step="1" id="sl-nivel" oninput="document.getElementById('nivel-out').textContent = lvlLabel(this.value)" />
+        <div class="range-val" id="nivel-out">Básico (2/5)</div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="field">
+      <label class="field-label">Quais recursos digitais você já utiliza? (múltipla escolha)</label>
+      <div class="check-grid">
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Scanner intraoral</span></div>
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Software de planejamento</span></div>
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Fresagem / CAD-CAM</span></div>
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Impressão 3D</span></div>
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Guias cirúrgicos digitais</span></div>
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Fotografia odontológica</span></div>
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Prontuário / gestão digital</span></div>
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Nenhum ainda</span></div>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Com que frequência o digital está presente na sua clínica?</label>
+      <div class="radio-grid">
+        <div class="radio-card" onclick="selectRadio(this,'freq')"><div class="r-dot"></div><span class="r-label">Nunca / raramente</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'freq')"><div class="r-dot"></div><span class="r-label">Às vezes, de forma pontual</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'freq')"><div class="r-dot"></div><span class="r-label">Com certa frequência</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'freq')"><div class="r-dot"></div><span class="r-label">É parte essencial da rotina</span></div>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Você possui algum equipamento digital na clínica?</label>
+      <div class="radio-grid">
+        <div class="radio-card" onclick="selectRadio(this,'equip')"><div class="r-dot"></div><span class="r-label">Sim, scanner intraoral</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'equip')"><div class="r-dot"></div><span class="r-label">Sim, impressora 3D</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'equip')"><div class="r-dot"></div><span class="r-label">Sim, outros</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'equip')"><div class="r-dot"></div><span class="r-label">Ainda não tenho</span></div>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goTo(1)">← Voltar</button>
+      <button class="btn-next" onclick="goTo(3)">Próxima etapa →</button>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 3 -->
+  <div class="section" id="sec3">
+    <div class="sec-header">
+      <div class="sec-num">// 03</div>
+      <div class="sec-title">Seus <span>gargalos</span></div>
+      <div class="sec-sub">Desafios reais do seu dia a dia com o digital</div>
+    </div>
+    <div class="field">
+      <label class="field-label">Quais são suas principais dificuldades? (múltipla escolha)</label>
+      <div class="check-grid">
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Falta de conhecimento técnico</span></div>
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Alto custo de equipamentos</span></div>
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Dificuldade de integrar à rotina</span></div>
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Falta de suporte e networking</span></div>
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Não sei por onde começar</span></div>
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Dificuldade com softwares</span></div>
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Resistência da equipe ou lab</span></div>
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Falta de cursos práticos</span></div>
+      </div>
+    </div>
+    <div class="field"><label class="field-label">Descreva seu maior obstáculo atual com o digital</label><textarea placeholder="Fale livremente..." id="f-obstaculo"></textarea></div>
+    <div class="field"><label class="field-label">Como você descreveria sua rotina de trabalho atual?</label><textarea placeholder="Quantos pacientes por dia, procedimentos, equipe, laboratório parceiro..." id="f-rotina"></textarea></div>
+    <div class="field">
+      <label class="field-label">Em quais procedimentos o digital poderia agregar mais? (múltipla escolha)</label>
+      <div class="check-grid">
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Próteses sobre implantes</span></div>
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Prótese total (protocolo)</span></div>
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Restaurações / facetas</span></div>
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Planejamento cirúrgico guiado</span></div>
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Comunicação com laboratório</span></div>
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Apresentação de casos ao paciente</span></div>
+      </div>
+    </div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goTo(2)">← Voltar</button>
+      <button class="btn-next" onclick="goTo(4)">Próxima etapa →</button>
+    </div>
+  </div>
+
+  <!-- SEÇÃO 4 -->
+  <div class="section" id="sec4">
+    <div class="sec-header">
+      <div class="sec-num">// 04</div>
+      <div class="sec-title">O que você <span>espera?</span></div>
+      <div class="sec-sub">Objetivos e expectativas com o ODP</div>
+    </div>
+    <div class="field">
+      <label class="field-label">Qual é o seu principal objetivo ao fazer o ODP?</label>
+      <div class="radio-grid">
+        <div class="radio-card" onclick="selectRadio(this,'obj')"><div class="r-dot"></div><span class="r-label">Implementar o digital na minha clínica</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'obj')"><div class="r-dot"></div><span class="r-label">Melhorar resultados clínicos</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'obj')"><div class="r-dot"></div><span class="r-label">Reduzir custos com laboratório</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'obj')"><div class="r-dot"></div><span class="r-label">Ampliar portfólio de serviços</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'obj')"><div class="r-dot"></div><span class="r-label">Me diferenciar no mercado</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'obj')"><div class="r-dot"></div><span class="r-label">Entender se o investimento faz sentido</span></div>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">O que você espera aprender / vivenciar no ODP? (múltipla escolha)</label>
+      <div class="check-grid">
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Fluxos digitais completos</span></div>
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Casos clínicos reais ao vivo</span></div>
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Domínio de softwares</span></div>
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Planejamento digital guiado</span></div>
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Networking com colegas</span></div>
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Suporte pós-curso</span></div>
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Protocolo claro para implementar</span></div>
+        <div class="check-card" onclick="toggleCheck(this)"><div class="c-box"></div><span class="r-label">Retorno financeiro sobre o digital</span></div>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Expectativa de retorno após o ODP</label>
+      <div class="radio-grid">
+        <div class="radio-card" onclick="selectRadio(this,'ret')"><div class="r-dot"></div><span class="r-label">Em até 1 mês</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'ret')"><div class="r-dot"></div><span class="r-label">Em até 3 meses</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'ret')"><div class="r-dot"></div><span class="r-label">Em até 6 meses</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'ret')"><div class="r-dot"></div><span class="r-label">No longo prazo (1 ano+)</span></div>
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Como ficou sabendo do ODP?</label>
+      <div class="radio-grid">
+        <div class="radio-card" onclick="selectRadio(this,'origem')"><div class="r-dot"></div><span class="r-label">Instagram @jonasildefonso</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'origem')"><div class="r-dot"></div><span class="r-label">Indicação de colega</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'origem')"><div class="r-dot"></div><span class="r-label">Sinbrasil / parceiro</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'origem')"><div class="r-dot"></div><span class="r-label">Já fiz outro curso com Dr. Jonas</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'origem')"><div class="r-dot"></div><span class="r-label">Evento / congresso</span></div>
+        <div class="radio-card" onclick="selectRadio(this,'origem')"><div class="r-dot"></div><span class="r-label">Outro</span></div>
+      </div>
+    </div>
+    <div class="field"><label class="field-label">Espaço livre — mensagem ao Dr. Jonas</label><textarea placeholder="Uma expectativa, um receio, uma motivação pessoal, uma pergunta..." id="f-livre"></textarea></div>
+    <div class="nav-row">
+      <button class="btn-back" onclick="goTo(3)">← Voltar</button>
+      <button class="btn-next" id="btn-submit" onclick="submitForm()">Enviar formulário ✓</button>
+    </div>
+    <div class="sending-msg" id="sending-msg">⏳ Enviando suas respostas...</div>
+    <div class="error-msg" id="error-msg">Erro ao enviar. Verifique sua conexão e tente novamente.</div>
+  </div>
+
+  <!-- SUCESSO -->
+  <div class="success-wrap" id="success">
+    <div class="success-icon">✓</div>
+    <h2>Formulário enviado!</h2>
+    <p>Obrigado por compartilhar isso com a gente.<br>Suas respostas vão nos ajudar a personalizar sua jornada no <strong>ODP</strong>.<br><br>Nos vemos em breve.</p>
+  </div>
+
+</div>
+
+<footer><span>ODP</span> · Odontologia Digital Sem Promessas · Dr. Jonas Ildefonso Jr.</footer>
+
+<script>
+// ══════════════════════════════════════════════════════════
+//  ⚠️  SUBSTITUA A URL ABAIXO PELA URL DO SEU WEB APP
+//     (gerada no Apps Script após o deploy)
+// ══════════════════════════════════════════════════════════
+var SHEET_URL = "COLE_AQUI_A_URL_DO_SEU_WEB_APP";
+// ══════════════════════════════════════════════════════════
+
+function lvlLabel(v) {
+  var m = {1:'Nenhuma (1/5)',2:'Básico (2/5)',3:'Intermediário (3/5)',4:'Avançado (4/5)',5:'Expert (5/5)'};
+  return m[v] || v;
+}
+
+function selectRadio(el, group) {
+  var siblings = el.parentElement.querySelectorAll('.radio-card');
+  siblings.forEach(function(c){ c.classList.remove('selected'); });
+  el.classList.add('selected');
+}
+
+function toggleCheck(el) { el.classList.toggle('selected'); }
+
+function getSelected(group) {
+  var el = document.querySelector('.radio-card.selected .r-label');
+  // busca dentro do grupo
+  var cards = document.querySelectorAll('[onclick*="selectRadio(this,\'' + group + '\')"]');
+  var found = '';
+  cards.forEach(function(c){
+    if(c.classList.contains('selected')) found = c.querySelector('.r-label').textContent.trim();
+  });
+  return found;
+}
+
+function getChecked(container) {
+  var cards = container.querySelectorAll('.check-card.selected .r-label');
+  var vals = [];
+  cards.forEach(function(c){ vals.push(c.textContent.trim()); });
+  return vals.join(', ');
+}
+
+function goTo(n) {
+  document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('visible'); });
+  var t = document.getElementById('sec' + n);
+  if(t) t.classList.add('visible');
+  for(var i=1;i<=4;i++){
+    var tick = document.getElementById('t'+i);
+    if(tick) tick.classList.toggle('done', i<=n);
+  }
+  document.getElementById('cur').textContent = n;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function submitForm() {
+  var btn = document.getElementById('btn-submit');
+  var sending = document.getElementById('sending-msg');
+  var errorEl = document.getElementById('error-msg');
+
+  // Coleta todos os dados
+  var data = {
+    nome:    document.getElementById('f-nome').value.trim(),
+    email:   document.getElementById('f-email').value.trim(),
+    whats:   document.getElementById('f-whats').value.trim(),
+    cidade:  document.getElementById('f-cidade').value.trim(),
+    ano:     document.getElementById('f-ano').value.trim(),
+    nivel:   document.getElementById('nivel-out').textContent,
+    obstaculo: document.getElementById('f-obstaculo').value.trim(),
+    rotina:  document.getElementById('f-rotina').value.trim(),
+    livre:   document.getElementById('f-livre').value.trim(),
+  };
+
+  // Coleta radio groups
+  var radioGroups = ['area','tipo','freq','equip','obj','ret','origem'];
+  radioGroups.forEach(function(g){
+    var cards = document.querySelectorAll('[onclick*="selectRadio(this,\'' + g + '\')"]');
+    var found = '';
+    cards.forEach(function(c){
+      if(c.classList.contains('selected')) found = c.querySelector('.r-label').textContent.trim();
+    });
+    data[g] = found;
+  });
+
+  // Coleta checkboxes (por seção)
+  var checkSections = {
+    recursos:      document.getElementById('sec2'),
+    dificuldades:  document.getElementById('sec3'),
+    procedimentos: document.getElementById('sec3'),
+    aprender:      document.getElementById('sec4'),
+  };
+
+  // Recursos digitais (sec2, primeiro check-grid)
+  var grids2 = document.getElementById('sec2').querySelectorAll('.check-grid');
+  data.recursos = getChecked(grids2[0]);
+
+  // Dificuldades + procedimentos (sec3)
+  var grids3 = document.getElementById('sec3').querySelectorAll('.check-grid');
+  data.dificuldades  = getChecked(grids3[0]);
+  data.procedimentos = getChecked(grids3[1]);
+
+  // Aprender (sec4)
+  var grids4 = document.getElementById('sec4').querySelectorAll('.check-grid');
+  data.aprender = getChecked(grids4[0]);
+
+  btn.disabled = true;
+  btn.textContent = 'Enviando...';
+  sending.style.display = 'block';
+  errorEl.style.display = 'none';
+
+  fetch(SHEET_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+  .then(function() {
+    // no-cors retorna opaque response; assumimos sucesso
+    document.querySelectorAll('.section').forEach(function(s){ s.classList.remove('visible'); });
+    document.getElementById('success').style.display = 'block';
+    for(var i=1;i<=4;i++){
+      var tick = document.getElementById('t'+i);
+      if(tick) tick.classList.add('done');
+    }
+    document.getElementById('cur').textContent = '4';
+    window.scrollTo({top:0,behavior:'smooth'});
+  })
+  .catch(function(err) {
+    btn.disabled = false;
+    btn.textContent = 'Enviar formulário ✓';
+    sending.style.display = 'none';
+    errorEl.style.display = 'block';
+  });
+}
+</script>
+</body>
+</html>
